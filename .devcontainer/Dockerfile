@@ -2,33 +2,82 @@ FROM ubuntu:22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
+# 1) Base dependencies
 RUN apt-get update && apt-get install -y \
+    autoconf \
+    automake \
+    autotools-dev \
     build-essential \
-    git \
-    curl \
-    python3 python3-pip \
-    make \
-    pkg-config \
-    cmake \
     clang \
-    g++ \
-    libffi-dev \
+    bison \
+    flex \
     libreadline-dev \
-    bison flex \
+    gawk \
+    tcl-dev \
+    libffi-dev \
+    cmake \
+    curl \
+    git \
+    graphviz \
+    xdot \
+    pkg-config \
+    python \
+    python3 \
+    python3-dev \
+    mercurial \
+    libboost-system-dev \
+    libboost-python-dev \
+    libboost-filesystem-dev \
     libboost-all-dev \
     libeigen3-dev \
+    zlib1g-dev \
+    libmpc-dev \
+    libftdi-dev \
+    libmpfr-dev \
+    libgmp-dev \
+    texinfo \
+    gperf \
+    libtool \
+    patchutils \
+    bc \
+    libexpat-dev \
+    qtbase5-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# --- Install yosys, nextpnr-ice40, icestorm ---
-# Option A: use distro packages (simpler, maybe older versions)
-RUN apt-get update && apt-get install -y \
-    yosys \
-    nextpnr-ice40 \
-    icestorm \
-    && rm -rf /var/lib/apt/lists/*
-
-# Set Python alias
+# Make "python" point to python3
 RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 1
 
-WORKDIR /workspace
+WORKDIR /opt
 
+# 2) Install IceStorm from source
+RUN git clone https://github.com/YosysHQ/icestorm.git && \
+    cd icestorm && \
+    make -j"$(nproc)" && \
+    make install && \
+    cd .. && \
+    rm -rf icestorm
+
+# 3) Install nextpnr (ice40) from source
+RUN git clone --recurse-submodules https://github.com/YosysHQ/nextpnr.git && \
+    cd nextpnr && \
+    mkdir build && cd build && \
+    cmake .. -DARCH=ice40 && \
+    make -j"$(nproc)" && \
+    make install && \
+    cd /opt && \
+    rm -rf nextpnr
+
+# 4) OSS CAD Suite (Yosys, etc.)
+#    You provided this URL; we use it as-is.
+RUN set -eux; \
+  curl -L "https://github.com/YosysHQ/oss-cad-suite-build/releases/download/2025-10-31/oss-cad-suite-linux-x64-20251031.tgz" \
+    -o /tmp/oss-cad.tgz; \
+  mkdir -p /opt && tar -xzf /tmp/oss-cad.tgz -C /opt; \
+  ln -s /opt/oss-cad-suite /opt/oss-cad; \
+  rm /tmp/oss-cad.tgz
+
+# 5) Put OSS CAD Suite tools first on PATH
+ENV PATH="/opt/oss-cad/bin:${PATH}"
+
+# Default workdir for your project (Codespace will mount repo here)
+WORKDIR /workspace
