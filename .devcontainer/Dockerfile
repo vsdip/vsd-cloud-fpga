@@ -12,7 +12,7 @@ RUN apt-get update && apt-get install -y \
     python-is-python3 \
     ca-certificates \
     libftdi-dev \
-    pkg-config \
+    pkg-config pip \
     && rm -rf /var/lib/apt/lists/*
 
 # Optional: make "python" point to python3 (redundant with python-is-python3 but harmless)
