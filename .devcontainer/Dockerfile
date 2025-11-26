@@ -21,9 +21,9 @@ RUN apt-get update && apt-get install -y \
     graphviz \
     xdot \
     pkg-config \
-    python \
     python3 \
     python3-dev \
+    python-is-python3 \
     mercurial \
     libboost-system-dev \
     libboost-python-dev \
@@ -44,7 +44,7 @@ RUN apt-get update && apt-get install -y \
     qtbase5-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Make "python" point to python3
+# (optional but harmless now; ensures `python` → python3)
 RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 1
 
 WORKDIR /opt
@@ -68,7 +68,6 @@ RUN git clone --recurse-submodules https://github.com/YosysHQ/nextpnr.git && \
     rm -rf nextpnr
 
 # 4) OSS CAD Suite (Yosys, etc.)
-#    You provided this URL; we use it as-is.
 RUN set -eux; \
   curl -L "https://github.com/YosysHQ/oss-cad-suite-build/releases/download/2025-10-31/oss-cad-suite-linux-x64-20251031.tgz" \
     -o /tmp/oss-cad.tgz; \
