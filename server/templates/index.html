@@ -1,1 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>VSD Cloud FPGA - Build & Program</title>
+    <style>
+        body { font-family: sans-serif; margin: 20px; }
+        .log-box {
+            white-space: pre-wrap;
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            padding: 10px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .msg { color: #d9534f; }
+    </style>
+</head>
+<body>
+    <h1>VSD Cloud FPGA</h1>
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <ul class="msg">
+          {% for m in messages %}
+            <li>{{ m }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+    <h3>1. Configure ngrok URL</h3>
+    <form method="post" action="/set_ngrok">
+        <label>ngrok URL to your local agent (e.g. https://abcd-1234.ngrok.io/flash):</label><br>
+        <input type="text" name="ngrok_url" value="{{ ngrok_url }}" style="width: 80%;">
+        <button type="submit">Save</button>
+    </form>
+
+    <h3>2. Build & Program</h3>
+    <p>Edit your Verilog design in <code>src/top.v</code> using the Codespaces editor, then:</p>
+    <form method="post" action="/build" style="display:inline;">
+        <button type="submit">Build bitstream (only)</button>
+    </form>
+    <form method="post" action="/build_and_program" style="display:inline; margin-left:10px;">
+        <button type="submit">Build & Program (via ngrok)</button>
+    </form>
+
+    <h3>Log</h3>
+    <div class="log-box">{{ log }}</div>
+</body>
+</html>
 
