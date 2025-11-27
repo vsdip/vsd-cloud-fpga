@@ -6,7 +6,7 @@
   "forwardPorts": [
     8000
   ],
-  "postCreateCommand": "pip install -r /workspace/vsd-cloud-fpga/server/requirements.txt || true",
+  "postCreateCommand": "pip install -r server/requirements.txt || true",
   "customizations": {
     "vscode": {
       "extensions": [
